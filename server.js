@@ -12,13 +12,27 @@ const app = express();
 passport.use(new GoogleStrategy({
   clientID: '74507653593-hh05qjnkjvcr5t3egth8sri1j0tg8s19.apps.googleusercontent.com',
   clientSecret: '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',
-  callbackURL: 'http://localhost:8000/auth/callback'
+  callbackURL: 'http://localhost:8000/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
 done(null, profile);
 }));
 
+// serialize user when saving to session
+passport.serializeUser((user, serialize) => {
+  serialize(null, user);
+});
+
+// deserialize user when reading from session
+passport.deserializeUser((obj, deserialize) => {
+  deserialize(null, obj);
+});
+
 app.engine('hbs', hbs({ extname: 'hbs', layoutsDir: './layouts', defaultLayout: 'main' }));
 app.set('view engine', '.hbs');
+
+app.use(session({ secret: 'anything' }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(cors());
 app.use(express.json());
@@ -36,6 +50,15 @@ app.get('/user/logged', (req, res) => {
 app.get('/user/no-permission', (req, res) => {
   res.render('noPermission');
 });
+
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['email', 'profile'] }));
+
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/user/no-permission' }),
+  (req, res) => {
+    res.redirect('/user/logged');
+  }
+);
 
 app.use('/', (req, res) => {
   res.status(404).render('notFound');
