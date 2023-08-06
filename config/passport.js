@@ -12,12 +12,12 @@ done(null, profile);
 
 // serialize user when saving to session
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, user);
 });
 
 // deserialize user when reading from session
-passport.deserializeUser((id, done) => {
-  done(null, {id});
+passport.deserializeUser((user, done) => {
+  done(null, user);
 });
 
 module.exports = passport;

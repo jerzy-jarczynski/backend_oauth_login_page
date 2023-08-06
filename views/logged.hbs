@@ -1,5 +1,5 @@
 <section class="index-page">
-  <p class="success">
-    You have been successfully logged in!
-  </p>
+  <img src="{{user.photos.0.value}}" alt="User avatar" class="avatar">
+  <h2>Hello {{user.displayName}}!</h2>
+  <a href="/auth/logout">Logout</a>
 </section>
